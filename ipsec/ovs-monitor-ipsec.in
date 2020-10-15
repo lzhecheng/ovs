@@ -43,6 +43,12 @@ $auth_section
     leftprotoport=gre
     rightprotoport=gre
 
+"""), "ip6gre": Template("""\
+conn $ifname-$version
+$auth_section
+    leftprotoport=ip6gre
+    rightprotoport=ip6gre
+
 """), "geneve": Template("""\
 conn $ifname-in-$version
 $auth_section
@@ -574,7 +580,7 @@ conn prevent_unencrypted_vxlan
         for name in tunnels:
             ver = monitor.tunnels[name].version
 
-            if monitor.tunnels[name].conf["tunnel_type"] == "gre":
+            if monitor.tunnels[name].conf["tunnel_type"] == "gre" or monitor.tunnels[name].conf["tunnel_type"] == "ip6gre":
                 conn = "%s-%s" % (name, ver)
                 self._start_ipsec_connection(conn)
             else:
@@ -954,7 +960,7 @@ class IPsecMonitor(object):
     def is_tunneling_type_supported(self, tunnel_type):
         """Returns True if we know how to configure IPsec for these
         types of tunnels.  Otherwise, returns False."""
-        return tunnel_type in ["gre", "geneve", "vxlan", "stt"]
+        return tunnel_type in ["gre", "ip6gre", "geneve", "vxlan", "stt"]
 
     def is_ipsec_required(self, options_column):
         """Return True if tunnel needs to be encrypted.  Otherwise,
